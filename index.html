@@ -1,10 +1,534 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>My Data Viz Site</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>San Francisco Crime Analysis | Data Storytelling</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-dark: #1a1a2e;
+            --primary-light: #f8f9fa;
+            --accent-1: #e63946;
+            --accent-2: #457b9d;
+            --accent-3: #f4a261;
+            --text-dark: #2c3e50;
+            --text-light: #7f8c8d;
+            --border-color: #ecf0f1;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+            line-height: 1.8;
+            color: var(--text-dark);
+            background-color: var(--primary-light);
+            overflow-x: hidden;
+        }
+
+        /* HEADER & NAVIGATION */
+        header {
+            position: sticky;
+            top: 0;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            z-index: 100;
+            padding: 1rem 2rem;
+        }
+
+        nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -1px;
+            background: linear-gradient(135deg, var(--accent-2), var(--accent-1));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 2.5rem;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: var(--text-dark);
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+
+        nav a:hover {
+            color: var(--accent-2);
+        }
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent-1);
+            transition: width 0.3s ease;
+        }
+
+        nav a:hover::after {
+            width: 100%;
+        }
+
+        /* HERO SECTION */
+        .hero {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, #2d3561 100%);
+            color: white;
+            padding: 8rem 2rem;
+            text-align: center;
+        }
+
+        .hero-content {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 8vw, 4rem);
+            font-weight: 800;
+            margin-bottom: 1rem;
+            letter-spacing: -1px;
+            line-height: 1.2;
+        }
+
+        .hero .subtitle {
+            font-size: 1.5rem;
+            font-weight: 300;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .hero-description {
+            font-size: 1.05rem;
+            line-height: 1.8;
+            opacity: 0.85;
+            max-width: 700px;
+            margin: 0 auto;
+            font-weight: 300;
+        }
+
+        /* MAIN CONTENT */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        section {
+            padding: 6rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        section:last-of-type {
+            border-bottom: none;
+        }
+
+        .section-header {
+            margin-bottom: 3rem;
+        }
+
+        .section-header h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-header h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 60px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+            border-radius: 2px;
+        }
+
+        .section-header p {
+            font-size: 1.1rem;
+            color: var(--text-light);
+            margin-top: 1.5rem;
+            line-height: 1.7;
+        }
+
+        /* CONTENT BLOCKS */
+        .content-block {
+            margin-bottom: 4rem;
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .image-section {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .image-section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.12);
+        }
+
+        .image-section img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .image-description {
+            padding: 2.5rem;
+        }
+
+        .image-description h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+        }
+
+        .image-description p {
+            color: var(--text-light);
+            line-height: 1.8;
+            font-size: 1rem;
+        }
+
+        /* VISUALIZATION SECTIONS */
+        .viz-container {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            margin-bottom: 3rem;
+        }
+
+        .viz-header {
+            padding: 2.5rem;
+            border-bottom: 1px solid var(--border-color);
+            background: linear-gradient(135deg, rgba(69, 123, 157, 0.05), rgba(230, 57, 70, 0.05));
+        }
+
+        .viz-header h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--text-dark);
+        }
+
+        .viz-header p {
+            color: var(--text-light);
+            line-height: 1.7;
+            font-size: 0.95rem;
+        }
+
+        .viz-iframe {
+            width: 100%;
+            height: 600px;
+            border: none;
+            display: block;
+        }
+
+        /* KEY INSIGHTS */
+        .insights {
+            background: linear-gradient(135deg, rgba(230, 57, 70, 0.05), rgba(69, 123, 157, 0.05));
+            border-left: 4px solid var(--accent-1);
+            padding: 2rem;
+            border-radius: 8px;
+            margin: 2rem 0;
+        }
+
+        .insights h4 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--accent-1);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .insights ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .insights li {
+            margin-bottom: 0.8rem;
+            padding-left: 1.5rem;
+            position: relative;
+            color: var(--text-light);
+            line-height: 1.6;
+        }
+
+        .insights li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--accent-2);
+            font-weight: bold;
+        }
+
+        /* FOOTER */
+        footer {
+            background: var(--primary-dark);
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+            margin-top: 4rem;
+        }
+
+        .footer-content {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        footer h3 {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        footer p {
+            opacity: 0.8;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: 1.5rem 0;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: var(--accent-2);
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent-1);
+        }
+
+        .divider {
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-2), var(--accent-1));
+            margin: 2rem auto;
+            border-radius: 2px;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            nav ul {
+                gap: 1.5rem;
+            }
+
+            nav a {
+                font-size: 0.85rem;
+            }
+
+            .hero {
+                padding: 4rem 1.5rem;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero .subtitle {
+                font-size: 1.1rem;
+            }
+
+            .section-header h2 {
+                font-size: 1.8rem;
+            }
+
+            .viz-iframe {
+                height: 400px;
+            }
+
+            .image-description {
+                padding: 1.5rem;
+            }
+
+            .footer-links {
+                gap: 1rem;
+            }
+        }
+
+        /* SMOOTH SCROLL */
+        html {
+            scroll-behavior: smooth;
+        }
+    </style>
 </head>
 <body>
-    <h1>Hello World!</h1>
-    <p>This site will soon contain interactive data visualizations about crime in San Francisco.</p>
+    <!-- HEADER -->
+    <header>
+        <nav>
+            <div class="logo">📊 Crime Analysis</div>
+            <ul>
+                <li><a href="#overview">Overview</a></li>
+                <li><a href="#patterns">Patterns</a></li>
+                <li><a href="#visualizations">Visualizations</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- HERO SECTION -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Understanding Crime in San Francisco</h1>
+            <p class="subtitle">What the data actually shows about crime in SF</p>
+            <p class="hero-description">
+                We analyzed crime data from San Francisco to figure out what's really going on. When does crime happen? Where does it happen? What does the data actually tell us?
+            </p>
+        </div>
+    </section>
+
+    <!-- MAIN CONTENT -->
+    <div class="container">
+        <!-- OVERVIEW SECTION -->
+        <section id="overview">
+            <div class="section-header">
+                <h2>What We Did</h2>
+                <p>We looked at crime data from SF and tried to find interesting patterns</p>
+            </div>
+
+            <div class="content-block">
+                <p style="font-size: 1.05rem; line-height: 1.8; color: var(--text-light); margin-bottom: 1.5rem;">
+                    So we got a bunch of crime data from San Francisco and started digging into it. We looked at when crimes happen, where they happen, and what types of crimes there are. We used statistics to figure out if different things in the data are related to each other. Basically, we tried to make sense of all the numbers and show it in a way that's actually interesting to look at.
+                </p>
+            </div>
+
+            <div class="insights">
+                <h4>📍 The Stuff We Actually Looked At</h4>
+                <ul>
+                    <li>Where crimes happen - which neighborhoods have more incidents?</li>
+                    <li>When crimes happen - time of day, days of the week, that kind of thing</li>
+                    <li>What types of crimes show up in the data</li>
+                    <li>Whether different variables actually relate to each other or not</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- PATTERNS SECTION -->
+        <section id="patterns">
+            <div class="section-header">
+                <h2>Do Things Actually Relate?</h2>
+                <p>Looking at whether different variables in the data are connected</p>
+            </div>
+
+            <div class="content-block">
+                <div class="image-section">
+                    <img src="images/pairwise_scatterplots_ols_coloured.png" alt="Pairwise scatterplots showing statistical relationships between variables">
+                    <div class="image-description">
+                        <h3>How Stuff Relates (Or Doesn't)</h3>
+                        <p>
+                            This chart compares a bunch of different variables two at a time to see if they're related. The different colors help you spot patterns and see where the data clusters. We also drew lines through the data to show the general trend. Basically, it helps us figure out if one thing goes up when another thing goes up, or if they're totally independent of each other. Pretty useful for understanding what actually matters.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VISUALIZATIONS SECTION -->
+        <section id="visualizations">
+            <div class="section-header">
+                <h2>Check Out These Maps & Charts</h2>
+                <p>Play around with these - they're actually interactive so you can zoom in and click stuff</p>
+            </div>
+
+            <!-- MAP VISUALIZATION -->
+            <div class="content-block">
+                <div class="viz-container">
+                    <div class="viz-header">
+                        <h3>🗺️ Where Stuff Happens</h3>
+                        <p>
+                            This is a map of San Francisco showing where the crimes happened. You can zoom in on it and see which neighborhoods have more incidents. Some areas definitely have a lot more than others - that's pretty interesting.
+                        </p>
+                    </div>
+                    <iframe class="viz-iframe" src="visualizations/sf_crime_map.html"></iframe>
+                </div>
+            </div>
+
+            <!-- TEMPORAL VISUALIZATION -->
+            <div class="content-block">
+                <div class="viz-container">
+                    <div class="viz-header">
+                        <h3>⏰ When Stuff Happens</h3>
+                        <p>
+                            This chart shows when crimes happen throughout the day. Some hours are way busier than others. You can interact with it to see more details. It's kind of cool to see when the peak times are.
+                        </p>
+                    </div>
+                    <iframe class="viz-iframe" src="visualizations/crime_hourly_interactive.html"></iframe>
+                </div>
+            </div>
+
+            <div class="insights">
+                <h4>💡 What We Noticed</h4>
+                <ul>
+                    <li>Time is a big factor - some times of day are way busier than others</li>
+                    <li>Location matters - certain neighborhoods definitely see more activity</li>
+                    <li>Everything connects somehow - it's not just random</li>
+                    <li>You can actually use this stuff to make decisions about where to focus attention</li>
+                </ul>
+            </div>
+        </section>
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="footer-content">
+            <h3>About This Project</h3>
+            <p>
+                We made this for a class project to practice data analysis and making visualizations. We wanted to take raw data and actually make it interesting so people would want to look at it.
+            </p>
+            <div class="divider"></div>
+            <p style="font-size: 0.9rem; opacity: 0.7;">
+                Made by students way too deep in the data | Data from SFPD
+            </p>
+        </div>
+    </footer>
 </body>
 </html>
