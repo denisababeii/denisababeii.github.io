@@ -1,534 +1,1200 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>San Francisco Crime Analysis | Data Storytelling</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>Changes: San Francisco's Drug Policies Worked, Until They Didn't</title>
 
-        :root {
-            --primary-dark: #1a1a2e;
-            --primary-light: #f8f9fa;
-            --accent-1: #e63946;
-            --accent-2: #457b9d;
-            --accent-3: #f4a261;
-            --text-dark: #2c3e50;
-            --text-light: #7f8c8d;
-            --border-color: #ecf0f1;
-        }
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet" />
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-            line-height: 1.8;
-            color: var(--text-dark);
-            background-color: var(--primary-light);
-            overflow-x: hidden;
-        }
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        /* HEADER & NAVIGATION */
-        header {
-            position: sticky;
-            top: 0;
-            background: white;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-            z-index: 100;
-            padding: 1rem 2rem;
-        }
+    :root {
+      --parchment:  #F4EFE6;
+      --navy:       #1C2B3A;
+      --brick:      #B84C3A;
+      --ochre:      #C8A96E;
+      --fog:        #E6EDF5;
+      --sage:       #E8EDE4;
+      --text-dark:  #2A2A2A;
+      --text-mid:   #3A3A3A;
+      --rule:       rgba(184, 76, 58, 0.22);
+      --font-serif: 'Playfair Display', Georgia, serif;
+      --font-sans:  'Source Sans 3', system-ui, sans-serif;
+      --max-w:      960px;
+      --pad-x:      clamp(1.25rem, 5vw, 3rem);
+      --section-pad: clamp(3rem, 8vw, 5.5rem);
+    }
 
-        nav {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+    html { scroll-behavior: smooth; }
 
-        .logo {
-            font-size: 1.5rem;
-            font-weight: 700;
-            letter-spacing: -1px;
-            background: linear-gradient(135deg, var(--accent-2), var(--accent-1));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
+    body {
+      background: var(--parchment);
+      color: var(--text-dark);
+      font-family: var(--font-sans);
+      font-weight: 300;
+      line-height: 1.7;
+      animation: pageFadeIn 0.9s ease both;
+    }
 
-        nav ul {
-            list-style: none;
-            display: flex;
-            gap: 2.5rem;
-        }
+    @keyframes pageFadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
 
-        nav a {
-            text-decoration: none;
-            color: var(--text-dark);
-            font-size: 0.95rem;
-            font-weight: 500;
-            transition: color 0.3s ease;
-            position: relative;
-        }
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .reveal.delay-1 { transition-delay: 0.12s; }
+    .reveal.delay-2 { transition-delay: 0.26s; }
+    .reveal.delay-3 { transition-delay: 0.42s; }
 
-        nav a:hover {
-            color: var(--accent-2);
-        }
+    /* ─── Header ─────────────────────────────────────────────── */
+    header {
+      background: var(--navy);
+      color: #fff;
+      padding: var(--section-pad) var(--pad-x);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
 
-        nav a::after {
-            content: '';
-            position: absolute;
-            bottom: -5px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: var(--accent-1);
-            transition: width 0.3s ease;
-        }
+    header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        repeating-linear-gradient(0deg,
+          transparent, transparent 39px,
+          rgba(255,255,255,0.03) 39px, rgba(255,255,255,0.03) 40px),
+        repeating-linear-gradient(90deg,
+          transparent, transparent 39px,
+          rgba(255,255,255,0.03) 39px, rgba(255,255,255,0.03) 40px);
+      pointer-events: none;
+    }
 
-        nav a:hover::after {
-            width: 100%;
-        }
+    .header-inner {
+      position: relative;
+      max-width: var(--max-w);
+      margin: 0 auto;
+    }
 
-        /* HERO SECTION */
-        .hero {
-            background: linear-gradient(135deg, var(--primary-dark) 0%, #2d3561 100%);
-            color: white;
-            padding: 8rem 2rem;
-            text-align: center;
-        }
+    .header-eyebrow {
+      font-family: var(--font-sans);
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--ochre);
+      margin-bottom: 1.2rem;
+    }
 
-        .hero-content {
-            max-width: 900px;
-            margin: 0 auto;
-        }
+    header h1 {
+      font-family: var(--font-serif);
+      font-size: clamp(1.85rem, 5vw, 3.4rem);
+      font-weight: 700;
+      line-height: 1.2;
+      letter-spacing: -0.01em;
+      color: #fff;
+      margin-bottom: 1.6rem;
+    }
 
-        .hero h1 {
-            font-size: clamp(2.5rem, 8vw, 4rem);
-            font-weight: 800;
-            margin-bottom: 1rem;
-            letter-spacing: -1px;
-            line-height: 1.2;
-        }
+    .header-rule {
+      width: 48px;
+      height: 2px;
+      background: var(--ochre);
+      margin: 0 auto 1.6rem;
+    }
 
-        .hero .subtitle {
-            font-size: 1.5rem;
-            font-weight: 300;
-            opacity: 0.9;
-            margin-bottom: 2rem;
-            line-height: 1.6;
-        }
+    header p {
+      font-size: clamp(0.93rem, 2vw, 1.08rem);
+      color: rgba(255,255,255,0.7);
+      max-width: 780px;
+      margin: 0 auto;
+      font-weight: 300;
+    }
 
-        .hero-description {
-            font-size: 1.05rem;
-            line-height: 1.8;
-            opacity: 0.85;
-            max-width: 700px;
-            margin: 0 auto;
-            font-weight: 300;
-        }
+    /* ─── Epigraph (Tupac quote) ─────────────────────────────── */
+    .epigraph {
+      margin: 2.2rem auto 0;
+      max-width: 480px;
+      padding: 0.8rem 1.4rem;
+      border-left: 2px solid rgba(200,169,110,0.45);
+      text-align: left;
+      display: inline-block;
+    }
 
-        /* MAIN CONTENT */
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 0 2rem;
-        }
+    .epigraph::before {
+      display: none;
+    }
 
-        section {
-            padding: 6rem 0;
-            border-bottom: 1px solid var(--border-color);
-        }
+    .epigraph-text {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 0.97rem;
+      color: rgba(255,255,255,0.8);
+      line-height: 1.55;
+      display: block;
+      margin-bottom: 0.3rem;
+    }
 
-        section:last-of-type {
-            border-bottom: none;
-        }
+    .epigraph-attribution {
+      font-family: var(--font-sans);
+      font-size: 0.67rem;
+      font-weight: 600;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+      color: rgba(200,169,110,0.62);
+      display: block;
+    }
 
-        .section-header {
-            margin-bottom: 3rem;
-        }
+    /* ─── Intro stat strip ───────────────────────────────────── */
+    .intro-stat-strip {
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      margin: 2rem 0 1.5rem;
+    }
 
-        .section-header h2 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            color: var(--text-dark);
-            position: relative;
-            display: inline-block;
-        }
+    .intro-stat {
+      flex: 1;
+      min-width: 160px;
+      background: rgba(200,169,110,0.07);
+      border: 1px solid rgba(200,169,110,0.2);
+      border-radius: 4px;
+      padding: 1.1rem 1.4rem;
+    }
 
-        .section-header h2::after {
-            content: '';
-            position: absolute;
-            bottom: -10px;
-            left: 0;
-            width: 60px;
-            height: 4px;
-            background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
-            border-radius: 2px;
-        }
+    .intro-stat-number {
+      font-family: var(--font-serif);
+      font-size: clamp(1.5rem, 3.5vw, 2rem);
+      font-weight: 700;
+      color: var(--brick);
+      display: block;
+      line-height: 1.1;
+    }
 
-        .section-header p {
-            font-size: 1.1rem;
-            color: var(--text-light);
-            margin-top: 1.5rem;
-            line-height: 1.7;
-        }
+    .intro-stat-label {
+      font-size: 0.76rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-mid);
+      margin-top: 0.3rem;
+      display: block;
+      line-height: 1.4;
+    }
 
-        /* CONTENT BLOCKS */
-        .content-block {
-            margin-bottom: 4rem;
-            animation: fadeInUp 0.8s ease-out forwards;
-        }
+    /* ─── Sections ───────────────────────────────────────────── */
+    .section { padding: var(--section-pad) var(--pad-x); }
+    .section--parchment { background: var(--parchment); }
+    .section--fog       { background: var(--fog); }
+    .section--sage      { background: var(--sage); }
+    .section--navy      { background: var(--navy); }
 
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+    .section-inner {
+      max-width: var(--max-w);
+      margin: 0 auto;
+    }
 
-        .image-section {
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
+    .section-label {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 1rem;
+      font-weight: 400;
+      color: var(--ochre);
+      letter-spacing: 0.14em;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
 
-        .image-section:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.12);
-        }
+    .section h2 {
+      font-family: var(--font-serif);
+      font-size: clamp(1.45rem, 3.5vw, 2.1rem);
+      font-weight: 700;
+      color: var(--navy);
+      line-height: 1.2;
+      margin-bottom: 0.55rem;
+    }
 
-        .image-section img {
-            width: 100%;
-            height: auto;
-            display: block;
-        }
+    .section--navy .section h2,
+    .section--navy h2 {
+      color: #fff;
+    }
 
-        .image-description {
-            padding: 2.5rem;
-        }
+    .section-desc {
+      font-size: clamp(0.87rem, 1.8vw, 0.98rem);
+      color: var(--text-mid);
+      margin-bottom: 1.8rem;
+      padding-bottom: 1.1rem;
+      border-bottom: 1px solid var(--rule);
+    }
 
-        .image-description h3 {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            color: var(--text-dark);
-        }
+    .section--navy .section-desc {
+      color: rgba(255,255,255,0.55);
+      border-bottom-color: rgba(200,169,110,0.22);
+    }
 
-        .image-description p {
-            color: var(--text-light);
-            line-height: 1.8;
-            font-size: 1rem;
-        }
+    .footnote {
+      margin-top: 0.75rem;
+      font-size: 0.78rem;
+      color: var(--text-mid);
+      font-style: italic;
+      line-height: 1.5;
+      opacity: 0.82;
+    }
 
-        /* VISUALIZATION SECTIONS */
-        .viz-container {
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
-            margin-bottom: 3rem;
-        }
+    /* ─── Text blocks ────────────────────────────────────────── */
+    .text-block { margin-bottom: 2rem; }
 
-        .viz-header {
-            padding: 2.5rem;
-            border-bottom: 1px solid var(--border-color);
-            background: linear-gradient(135deg, rgba(69, 123, 157, 0.05), rgba(230, 57, 70, 0.05));
-        }
+    .text-block p {
+      font-size: clamp(0.87rem, 1.8vw, 0.98rem);
+      color: var(--text-mid);
+      margin-bottom: 1rem;
+      line-height: 1.75;
+    }
 
-        .viz-header h3 {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            color: var(--text-dark);
-        }
+    .text-block p:last-child { margin-bottom: 0; }
 
-        .viz-header p {
-            color: var(--text-light);
-            line-height: 1.7;
-            font-size: 0.95rem;
-        }
+    .section--navy .text-block p {
+      color: rgba(255,255,255,0.65);
+    }
 
-        .viz-iframe {
-            width: 100%;
-            height: 600px;
-            border: none;
-            display: block;
-        }
+    /* ─── Bridge / transition block ─────────────────────────── */
+    .bridge {
+      border-left: 3px solid var(--ochre);
+      padding: 1rem 1.4rem;
+      margin: 2.5rem 0 0;
+      background: rgba(200,169,110,0.06);
+      border-radius: 0 4px 4px 0;
+    }
 
-        /* KEY INSIGHTS */
-        .insights {
-            background: linear-gradient(135deg, rgba(230, 57, 70, 0.05), rgba(69, 123, 157, 0.05));
-            border-left: 4px solid var(--accent-1);
-            padding: 2rem;
-            border-radius: 8px;
-            margin: 2rem 0;
-        }
+    .bridge p {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: clamp(0.9rem, 1.8vw, 1.02rem);
+      color: var(--navy);
+      line-height: 1.7;
+      margin: 0;
+    }
 
-        .insights h4 {
-            font-size: 1.1rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            color: var(--accent-1);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
+    .section--navy .bridge {
+      background: rgba(200,169,110,0.08);
+      border-left-color: var(--ochre);
+    }
 
-        .insights ul {
-            list-style: none;
-            padding-left: 0;
-        }
+    .section--navy .bridge p {
+      color: rgba(255,255,255,0.75);
+    }
 
-        .insights li {
-            margin-bottom: 0.8rem;
-            padding-left: 1.5rem;
-            position: relative;
-            color: var(--text-light);
-            line-height: 1.6;
-        }
+    /* ─── Two-column stat strip ─────────────────────────────── */
+    .stat-strip {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1px;
+      background: var(--rule);
+      border: 1px solid var(--rule);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 2rem;
+    }
 
-        .insights li::before {
-            content: '→';
-            position: absolute;
-            left: 0;
-            color: var(--accent-2);
-            font-weight: bold;
-        }
+    .stat-cell {
+      background: var(--parchment);
+      padding: 1.4rem 1.6rem;
+      text-align: center;
+    }
 
-        /* FOOTER */
-        footer {
-            background: var(--primary-dark);
-            color: white;
-            padding: 3rem 2rem;
-            text-align: center;
-            margin-top: 4rem;
-        }
+    .section--fog .stat-cell { background: var(--fog); }
+    .section--sage .stat-cell { background: var(--sage); }
 
-        .footer-content {
-            max-width: 1000px;
-            margin: 0 auto;
-        }
+    .stat-cell-number {
+      font-family: var(--font-serif);
+      font-size: clamp(1.6rem, 4vw, 2.2rem);
+      font-weight: 700;
+      color: var(--brick);
+      display: block;
+      line-height: 1.1;
+    }
 
-        footer h3 {
-            font-size: 1.3rem;
-            margin-bottom: 1rem;
-            font-weight: 600;
-        }
+    .stat-cell-label {
+      font-size: 0.76rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-mid);
+      margin-top: 0.3rem;
+      display: block;
+    }
 
-        footer p {
-            opacity: 0.8;
-            line-height: 1.6;
-            margin-bottom: 1.5rem;
-        }
+    /* ─── Images & iframes ───────────────────────────────────── */
+    .img-wrapper {
+      width: 100%;
+      border: 1px solid rgba(28,43,58,0.1);
+      border-radius: 3px;
+      overflow: hidden;
+      box-shadow: 0 4px 24px rgba(28,43,58,0.08);
+    }
 
-        .footer-links {
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-            margin: 1.5rem 0;
-            flex-wrap: wrap;
-        }
+    .img-wrapper img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
 
-        .footer-links a {
-            color: var(--accent-2);
-            text-decoration: none;
-            font-size: 0.95rem;
-            transition: color 0.3s ease;
-        }
+    .iframe-outer {
+      position: relative;
+      width: 100%;
+      border-radius: 3px;
+      overflow: hidden;
+      border: 1px solid rgba(28,43,58,0.1);
+      box-shadow: 0 4px 24px rgba(28,43,58,0.08);
+    }
 
-        .footer-links a:hover {
-            color: var(--accent-1);
-        }
+    .iframe-ratio {
+      position: relative;
+      width: 100%;
+      padding-top: 56.25%;
+    }
 
-        .divider {
-            width: 60px;
-            height: 3px;
-            background: linear-gradient(90deg, var(--accent-2), var(--accent-1));
-            margin: 2rem auto;
-            border-radius: 2px;
-        }
+    @media (min-width: 640px) {
+      .iframe-ratio {
+        padding-top: 0;
+        height: 520px;
+      }
+      .iframe-ratio--tall {
+        height: 660px;
+      }
+    }
 
-        /* RESPONSIVE */
-        @media (max-width: 768px) {
-            nav ul {
-                gap: 1.5rem;
-            }
+    .iframe-ratio iframe {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
 
-            nav a {
-                font-size: 0.85rem;
-            }
+    .fullscreen-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      margin-top: 0.85rem;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--brick);
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+      transition: border-color 0.2s ease, opacity 0.2s ease;
+    }
 
-            .hero {
-                padding: 4rem 1.5rem;
-            }
+    .fullscreen-link:hover { border-color: var(--brick); opacity: 0.75; }
 
-            .hero h1 {
-                font-size: 2rem;
-            }
+    .fullscreen-link svg {
+      width: 12px; height: 12px;
+      stroke: currentColor; fill: none;
+      stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+    }
 
-            .hero .subtitle {
-                font-size: 1.1rem;
-            }
+    /* ─── Policy era cards ───────────────────────────────────── */
+    .era-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.25rem;
+      margin-top: 2rem;
+    }
 
-            .section-header h2 {
-                font-size: 1.8rem;
-            }
+    .era-card {
+      border-radius: 6px;
+      padding: 1.5rem 1.6rem;
+      border-left: 4px solid var(--era-color, var(--ochre));
+      background: #fff;
+      box-shadow: 0 2px 12px rgba(28,43,58,0.06);
+      position: relative;
+    }
 
-            .viz-iframe {
-                height: 400px;
-            }
+    .section--fog .era-card { background: #fff; }
 
-            .image-description {
-                padding: 1.5rem;
-            }
+    .era-card-year {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 0.72rem;
+      letter-spacing: 0.15em;
+      color: var(--era-color, var(--ochre));
+      text-transform: uppercase;
+      margin-bottom: 0.35rem;
+      display: block;
+    }
 
-            .footer-links {
-                gap: 1rem;
-            }
-        }
+    .era-card h3 {
+      font-family: var(--font-serif);
+      font-size: 0.98rem;
+      font-weight: 700;
+      color: var(--navy);
+      line-height: 1.25;
+      margin-bottom: 0.55rem;
+    }
 
-        /* SMOOTH SCROLL */
-        html {
-            scroll-behavior: smooth;
-        }
-    </style>
+    .era-card p {
+      font-size: 0.83rem;
+      color: var(--text-mid);
+      line-height: 1.65;
+      margin-bottom: 0.6rem;
+    }
+
+    .era-card-outcome {
+      font-size: 0.77rem;
+      font-weight: 600;
+      color: var(--era-color, var(--ochre));
+      border-top: 1px solid rgba(28,43,58,0.08);
+      padding-top: 0.55rem;
+      margin-top: 0.2rem;
+    }
+
+    /* ─── Flip cards (data section) ──────────────────────────── */
+    .flip-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .flip-card { perspective: 1000px; cursor: pointer; }
+
+    .flip-card-inner {
+      position: relative;
+      width: 100%;
+      min-height: 300px;
+      transform-style: preserve-3d;
+      transition: transform 0.6s ease;
+    }
+
+    .flip-card.flipped .flip-card-inner { transform: rotateY(180deg); }
+
+    .flip-card-front,
+    .flip-card-back {
+      position: absolute;
+      inset: 0;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      border-radius: 6px;
+      padding: 1.75rem;
+      border: 1px solid rgba(28,43,58,0.1);
+      box-shadow: 0 4px 24px rgba(28,43,58,0.08);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .flip-card-front { background: #fff; }
+    .flip-card-back { background: var(--navy); color: rgba(255,255,255,0.88); transform: rotateY(180deg); }
+
+    .flip-card-number {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 0.78rem;
+      color: var(--ochre);
+      letter-spacing: 0.14em;
+      margin-bottom: 0.65rem;
+    }
+
+    .flip-card-front h3 { font-family: var(--font-serif); font-size: 1.05rem; font-weight: 700; color: var(--navy); margin-bottom: 0.7rem; line-height: 1.25; }
+    .flip-card-back h3  { font-family: var(--font-serif); font-size: 1.05rem; font-weight: 700; color: var(--ochre); margin-bottom: 0.75rem; line-height: 1.25; }
+
+    .flip-card-front p { font-size: 0.875rem; line-height: 1.7; flex: 1; color: var(--text-mid); }
+    .flip-card-back p  { font-size: 0.875rem; line-height: 1.7; flex: 1; color: rgba(255,255,255,0.78); }
+
+    .flip-card-hint {
+      margin-top: 1.1rem;
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.11em;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .flip-card-front .flip-card-hint { color: var(--brick); }
+    .flip-card-back  .flip-card-hint { color: rgba(200,169,110,0.7); }
+
+    /* ─── Conclusion callout ─────────────────────────────────── */
+    .conclusion-box {
+      background: rgba(200,169,110,0.1);
+      border: 1px solid rgba(200,169,110,0.3);
+      border-radius: 6px;
+      padding: 2rem 2.2rem;
+      margin-top: 2rem;
+      text-align: center;
+    }
+
+    .conclusion-box p {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: clamp(1rem, 2.2vw, 1.18rem);
+      color: rgba(255,255,255,0.82);
+      line-height: 1.75;
+    }
+
+    /* ─── References ─────────────────────────────────────────── */
+    .references-list { list-style: none; margin-top: 1.5rem; }
+
+    .references-list li {
+      padding: 0.9rem 0;
+      border-bottom: 1px solid var(--rule);
+      font-size: 0.875rem;
+      color: var(--text-mid);
+      line-height: 1.65;
+      scroll-margin-top: 80px;
+    }
+
+    .references-list li:last-child { border-bottom: none; }
+
+    .references-list .ref-number {
+      font-family: var(--font-serif);
+      font-style: italic;
+      color: var(--ochre);
+      margin-right: 0.35rem;
+    }
+
+    .references-list a {
+      color: var(--brick);
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+      transition: border-color 0.2s ease;
+      word-break: break-all;
+    }
+
+    .references-list a:hover { border-color: var(--brick); }
+
+    sup a {
+      color: var(--brick);
+      text-decoration: none;
+      font-size: 0.68em;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+
+    sup a:hover { text-decoration: underline; }
+
+    /* ─── Footer ─────────────────────────────────────────────── */
+    footer {
+      background: var(--navy);
+      color: rgba(255,255,255,0.38);
+      text-align: center;
+      padding: 2rem var(--pad-x);
+      font-size: 0.75rem;
+      letter-spacing: 0.06em;
+    }
+
+    footer span { color: var(--ochre); }
+
+    /* ─── Act divider ────────────────────────────────────────── */
+    .act-divider {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1.5rem var(--pad-x);
+      background: var(--navy);
+      justify-content: center;
+    }
+
+    .act-divider-line {
+      flex: 1;
+      max-width: 120px;
+      height: 1px;
+      background: rgba(200,169,110,0.3);
+    }
+
+    .act-divider-label {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 0.8rem;
+      color: var(--ochre);
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+  </style>
 </head>
+
 <body>
-    <!-- HEADER -->
-    <header>
-        <nav>
-            <div class="logo">📊 Crime Analysis</div>
-            <ul>
-                <li><a href="#overview">Overview</a></li>
-                <li><a href="#patterns">Patterns</a></li>
-                <li><a href="#visualizations">Visualizations</a></li>
-            </ul>
-        </nav>
-    </header>
 
-    <!-- HERO SECTION -->
-    <section class="hero">
-        <div class="hero-content">
-            <h1>Understanding Crime in San Francisco</h1>
-            <p class="subtitle">What the data actually shows about crime in SF</p>
-            <p class="hero-description">
-                We analyzed crime data from San Francisco to figure out what's really going on. When does crime happen? Where does it happen? What does the data actually tell us?
-            </p>
+  <!-- ══ HEADER ═══════════════════════════════════════════════ -->
+  <header>
+    <div class="header-inner">
+      <p class="header-eyebrow">San Francisco &nbsp;·&nbsp; Drug Policies &amp; Crime Data</p>
+      <h1>Changes:<br><span style="font-size:0.72em; font-weight:400; font-style:italic;">San Francisco's Drug Policies Worked, Until They Didn't</span></h1>
+      <div class="header-rule"></div>
+      <p>
+        During the new century, San Francisco has adopted a new perspective towards drug crimes,
+        gradually moving away from pure enforcement, towards treating drug use as a public health issue.
+        For a long time numbers seemed to support that change, but something shifted in the last years.
+        This is what the data shows.
+      </p>
+      <div style="text-align:center;">
+        <div class="epigraph">
+          <span class="epigraph-text">Instead of a war on poverty, they got a war on drugs.</span>
+          <span class="epigraph-attribution">Tupac Shakur &nbsp;·&nbsp; "Changes" (1998)</span>
         </div>
-    </section>
-
-    <!-- MAIN CONTENT -->
-    <div class="container">
-        <!-- OVERVIEW SECTION -->
-        <section id="overview">
-            <div class="section-header">
-                <h2>What We Did</h2>
-                <p>We looked at crime data from SF and tried to find interesting patterns</p>
-            </div>
-
-            <div class="content-block">
-                <p style="font-size: 1.05rem; line-height: 1.8; color: var(--text-light); margin-bottom: 1.5rem;">
-                    So we got a bunch of crime data from San Francisco and started digging into it. We looked at when crimes happen, where they happen, and what types of crimes there are. We used statistics to figure out if different things in the data are related to each other. Basically, we tried to make sense of all the numbers and show it in a way that's actually interesting to look at.
-                </p>
-            </div>
-
-            <div class="insights">
-                <h4>📍 The Stuff We Actually Looked At</h4>
-                <ul>
-                    <li>Where crimes happen - which neighborhoods have more incidents?</li>
-                    <li>When crimes happen - time of day, days of the week, that kind of thing</li>
-                    <li>What types of crimes show up in the data</li>
-                    <li>Whether different variables actually relate to each other or not</li>
-                </ul>
-            </div>
-        </section>
-
-        <!-- PATTERNS SECTION -->
-        <section id="patterns">
-            <div class="section-header">
-                <h2>Do Things Actually Relate?</h2>
-                <p>Looking at whether different variables in the data are connected</p>
-            </div>
-
-            <div class="content-block">
-                <div class="image-section">
-                    <img src="images/pairwise_scatterplots_ols_coloured.png" alt="Pairwise scatterplots showing statistical relationships between variables">
-                    <div class="image-description">
-                        <h3>How Stuff Relates (Or Doesn't)</h3>
-                        <p>
-                            This chart compares a bunch of different variables two at a time to see if they're related. The different colors help you spot patterns and see where the data clusters. We also drew lines through the data to show the general trend. Basically, it helps us figure out if one thing goes up when another thing goes up, or if they're totally independent of each other. Pretty useful for understanding what actually matters.
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- VISUALIZATIONS SECTION -->
-        <section id="visualizations">
-            <div class="section-header">
-                <h2>Check Out These Maps & Charts</h2>
-                <p>Play around with these - they're actually interactive so you can zoom in and click stuff</p>
-            </div>
-
-            <!-- MAP VISUALIZATION -->
-            <div class="content-block">
-                <div class="viz-container">
-                    <div class="viz-header">
-                        <h3>🗺️ Where Stuff Happens</h3>
-                        <p>
-                            This is a map of San Francisco showing where the crimes happened. You can zoom in on it and see which neighborhoods have more incidents. Some areas definitely have a lot more than others - that's pretty interesting.
-                        </p>
-                    </div>
-                    <iframe class="viz-iframe" src="visualizations/sf_crime_map.html"></iframe>
-                </div>
-            </div>
-
-            <!-- TEMPORAL VISUALIZATION -->
-            <div class="content-block">
-                <div class="viz-container">
-                    <div class="viz-header">
-                        <h3>⏰ When Stuff Happens</h3>
-                        <p>
-                            This chart shows when crimes happen throughout the day. Some hours are way busier than others. You can interact with it to see more details. It's kind of cool to see when the peak times are.
-                        </p>
-                    </div>
-                    <iframe class="viz-iframe" src="visualizations/crime_hourly_interactive.html"></iframe>
-                </div>
-            </div>
-
-            <div class="insights">
-                <h4>💡 What We Noticed</h4>
-                <ul>
-                    <li>Time is a big factor - some times of day are way busier than others</li>
-                    <li>Location matters - certain neighborhoods definitely see more activity</li>
-                    <li>Everything connects somehow - it's not just random</li>
-                    <li>You can actually use this stuff to make decisions about where to focus attention</li>
-                </ul>
-            </div>
-        </section>
+      </div>
     </div>
+  </header>
 
-    <!-- FOOTER -->
-    <footer>
-        <div class="footer-content">
-            <h3>About This Project</h3>
-            <p>
-                We made this for a class project to practice data analysis and making visualizations. We wanted to take raw data and actually make it interesting so people would want to look at it.
-            </p>
-            <div class="divider"></div>
-            <p style="font-size: 0.9rem; opacity: 0.7;">
-                Made by students way too deep in the data | Data from SFPD
-            </p>
+  <!-- ══ INTRODUCTION ══════════════════════════════════════════ -->
+  <section class="section section--parchment">
+    <div class="section-inner">
+      <span class="section-label reveal">Introduction</span>
+      <h2 class="reveal delay-1">A City That Decided to Try Something Different</h2>
+      <p class="section-desc reveal delay-2">
+        What the data measures, and the human story behind it.
+      </p>
+
+      <div class="text-block reveal delay-2">
+        <p>
+          For much of the 20th century, drug enforcement across the United States followed
+          a very strict approach. The Boggs Act (1951) established mandatory prison sentences
+          for drug-related offenses. In the 1970s, the War on Drugs intensified, having a special
+          emphasis on law enforcement, leading to the creation of the DEA.<sup><a href="#ref-1">[1]</a></sup>
+          The appearance of new drugs such as crack cocaine in the 1980s and other synthetic substances
+          led to even harsher policies <sup><a href="#ref-2">[2]</a></sup>.
+        </p>
+        <p>
+          By the early 2000s, a growing number of people living on the streets and consumption-related
+          health crises prompted some cities to ask wheter the strict enforcement approach was actually
+          useful for solving the problem. San Francisco was among those cities <sup><a href="#ref-3">[3]</a></sup>.
+          Gradually, and without abandoning enforcement entirely, San Francisco began considering alternatives.
+          The idea was not to stop caring about drug crime, but to treat the person behind
+          the offense differently. To focus on prevention and harm reduction rather than direct punishment.
+        </p>
+        <p>
+          The San Francisco Police Department's official records
+          <sup><a href="#ref-4">[4]</a></sup> capture drug offense incidents
+          since 2003, allowing to see the recent evolution of drug offenses in the city, and to understand how
+          the shift in policies affected them. Drug offenses in those records divide into two fundamental activities:
+          <strong>Sales &amp; Distribution</strong>, the supply side,
+          and <strong>Street Possession &amp; Personal Use</strong>, the demand side.
+          These two categories do not behave the same way under the same policies.
+          Their difference, visible in the data, is where the story becomes interesting.
+        </p>
+      </div>
+
+      <!-- Grounding numbers near the emotional opening -->
+      <div class="intro-stat-strip reveal delay-2">
+        <div class="intro-stat">
+          <span class="intro-stat-number">6,716</span>
+          <span class="intro-stat-label">Drug offenses in SF (2025)<br> More than tripled since 2021</span>
         </div>
-    </footer>
+        <div class="intro-stat">
+          <span class="intro-stat-number">−89.7%</span>
+          <span class="intro-stat-label">Fall in possession incidents<br> between 2003 and 2021</span>
+        </div>
+        <div class="intro-stat">
+          <span class="intro-stat-number">23 yrs</span>
+          <span class="intro-stat-label">Of policy changes captured<br> in this dataset (2003–2025)</span>
+        </div>
+      </div>
+
+      <!-- Data cards -->
+      <div class="flip-grid">
+        <div class="flip-card reveal delay-1" role="button" tabindex="0" aria-label="The Dataset — click to flip">
+          <div class="flip-card-inner">
+            <div class="flip-card-front">
+              <span class="flip-card-number">i</span>
+              <h3>The Dataset</h3>
+              <p>Two datasets from the SF Police Department's official open data portal, covering 2003 to 2025.
+                They were combined for this analysis.</p>
+              <span class="flip-card-hint">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+                Flip for detail
+              </span>
+            </div>
+            <div class="flip-card-back">
+              <span class="flip-card-number"></span>
+              <h3>The Dataset</h3>
+              <p>Data sourced from DataSF: <em>Police Department Incident Reports: Historical 2003 to May 2018</em>
+                <sup><a href="#ref-5">[5]</a></sup>and <em>2018 to Present</em> <sup><a href="#ref-6">[6]</a></sup>.
+                Over 145,000 drug offense records were analysed across 23 years, 8 different policies eras, and 10 police districts.</p>
+              <span class="flip-card-hint">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+                Click to flip back
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="flip-card reveal delay-2" role="button" tabindex="0" aria-label="What is measured — click to flip">
+          <div class="flip-card-inner">
+            <div class="flip-card-front">
+              <span class="flip-card-number">ii</span>
+              <h3>What Is Being Measured</h3>
+              <p>Drug offenses span 129 distinct incident descriptions in the SFPD data.
+                For this analysis they were grouped into five meaningful categories.
+              </p>
+              <span class="flip-card-hint">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+                Flip for detail
+              </span>
+            </div>
+            <div class="flip-card-back">
+              <span class="flip-card-number"></span>
+              <h3>Five Drug Crime Categories</h3>
+              <p>
+                <strong style="color:var(--ochre); font-size:0.68rem; letter-spacing:0.1em; text-transform:uppercase;">Two main categories</strong>
+                <div style="border-top:1px solid rgba(200,169,110,0.25); margin:0.3rem 0 0.4rem;"></div>
+                <span style="font-size:0.78rem;"><strong style="color:var(--ochre)">Street Possession &amp; Personal Use</strong> · demand side, addiction-driven.<br>
+                <strong style="color:var(--ochre)">Sales &amp; Distribution</strong> · active street dealing.</span>
+
+                <div style="margin-top:0.7rem;"></div>
+
+                <strong style="color:var(--ochre); font-size:0.68rem; letter-spacing:0.1em; text-transform:uppercase;">Three secondary categories</strong>
+                <div style="border-top:1px solid rgba(200,169,110,0.25); margin:0.3rem 0 0.4rem;"></div>
+                <span style="font-size:0.78rem;"><strong style="color:var(--ochre)">Transportation · Production · Prescription Fraud</strong></span>
+              </p>
+              <span class="flip-card-hint">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+                Click to flip back
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="flip-card reveal delay-3" role="button" tabindex="0" aria-label="How to read the story — click to flip">
+          <div class="flip-card-inner">
+            <div class="flip-card-front">
+              <span class="flip-card-number">iii</span>
+              <h3>How to Read This Story</h3>
+              <p>
+                The data story unfolds in three acts:
+                <ul style="list-style:none; margin:0; padding:0; font-size:0.8rem;">
+                  <li style="padding:0.3rem 0; border-bottom:1px solid rgba(200,169,110,0.2);">
+                    <strong style="color:var(--ochre)">Act I</strong> · City-wide trends
+                  </li>
+                  <li style="padding:0.3rem 0; border-bottom:1px solid rgba(200,169,110,0.2);">
+                    <strong style="color:var(--ochre)">Act II</strong> · Geographic breakdown
+                  </li>
+                  <li style="padding:0.3rem 0;">
+                    <strong style="color:var(--ochre)">Act III</strong> · Drug type composition
+                  </li>
+                </ul>
+              </p>
+              <span class="flip-card-hint">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+                Flip for detail
+              </span>
+            </div>
+            <div class="flip-card-back">
+              <span class="flip-card-number"></span>
+              <h3>Three Acts, One Story</h3>
+              <p>
+                <strong style="color:var(--ochre)">Act I</strong> — The city-wide data: how did total drug crime change across policy eras?<br><br>
+                <strong style="color:var(--ochre)">Act II</strong> — The geographic layer: were changes different in various districts?<br><br>
+                <strong style="color:var(--ochre)">Act III</strong> — The composition shift: is today's drug problem the same as yesterday's?
+              </p>
+              <span class="flip-card-hint">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+                Click to flip back
+              </span>
+            </div>
+          </div>
+        </div>
+      </div><!-- /flip-grid -->
+
+      <div class="bridge reveal delay-3">
+        <p>
+          Below is what happened when San Francisco decided to try a different path. It is
+          told through eight policy eras, and the numbers each one left behind.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ ACT DIVIDER I ═════════════════════════════════════════ -->
+  <div class="act-divider">
+    <div class="act-divider-line"></div>
+    <span class="act-divider-label">Act I — The City-Wide Story</span>
+    <div class="act-divider-line"></div>
+  </div>
+
+  <!-- ══ SECTION — ACT I ═══════════════════════════════════════ -->
+  <section class="section section--fog">
+    <div class="section-inner">
+      <span class="section-label reveal">Figure 1</span>
+      <h2 class="reveal delay-1">Twenty Years of Policy, Captured in Two Lines</h2>
+      <p class="section-desc reveal delay-2">
+        Street possession and drug sales responded very differently to the same policy shifts.
+      </p>
+
+      <div class="text-block reveal delay-2">
+        <p>
+          From 2003 to the late 2010s, San Francisco's drug offense numbers told an encouraging story.
+          Both possession and sales incidents declined steadily — a trend that coincided with a series
+          of increasingly progressive policy interventions. Then COVID-19 hit, enforcement effectively
+          paused, and a sharp recovery followed. By 2025, drug offenses were climbing back toward levels
+          not seen in a decade.
+        </p>
+        <p>
+          The chart below traces this arc through eight distinct policy eras. The vertical markers show
+          when each major intervention was introduced. Notice that possession and sales do not always
+          move together — when they diverge, policy is rarely the only explanation.
+        </p>
+      </div>
+
+      <div class="img-wrapper reveal delay-3">
+        <img
+          src="images/act1_drug_policy_chart.png"
+          alt="SF drug offenses by possession and sales type across policy eras 2003–2025"
+          loading="eager"
+        />
+      </div>
+      <p class="footnote reveal delay-3">
+        Figure 1. Annual drug offense incidents in San Francisco (2003–2025), split by Street Possession &amp; Personal Use (left)
+        and Sales &amp; Distribution (right). Vertical dashed lines mark the introduction of key policy interventions.
+        Raw totals shown; 2025 represents partial-year data annualised. Source: SFPD via DataSF <sup><a href="#ref-1">[1]</a></sup>.
+      </p>
+
+      <!-- Policy era cards -->
+      <div style="margin-top: 3rem;" class="reveal delay-1">
+        <span class="section-label">The Eight Policy Eras</span>
+        <p style="font-size:0.88rem; color:var(--text-mid); margin-bottom:0.5rem;">
+          Each era represents a shift in how San Francisco approached drug enforcement.
+          The data outcome row shows what the numbers actually showed in the years following each change.
+        </p>
+      </div>
+
+      <div class="era-grid">
+
+        <div class="era-card reveal delay-1" style="--era-color: #4393c3;">
+          <span class="era-card-year">2003 – 2005</span>
+          <h3>Pre-Reform Baseline</h3>
+          <p>High-enforcement era. Drug arrests were treated primarily as criminal matters, with limited diversion options. Both possession and sales volumes were at their peak for the dataset period.</p>
+          <div class="era-card-outcome">Data outcome: Highest recorded possession levels — over 7,500 incidents annually.</div>
+        </div>
+
+        <div class="era-card reveal delay-2" style="--era-color: #2166ac;">
+          <span class="era-card-year">2006 – 2008</span>
+          <h3>Drug Court Expansion</h3>
+          <p>San Francisco expanded its Drug Court programme, offering treatment-based alternatives to incarceration for non-violent drug offenders. Judges could divert eligible individuals into supervised rehabilitation.</p>
+          <div class="era-card-outcome">Data outcome: Modest initial decline in possession; sales remained elevated.</div>
+        </div>
+
+        <div class="era-card reveal delay-3" style="--era-color: #92c5de;">
+          <span class="era-card-year">2009 – 2010</span>
+          <h3>Back on Track DA Programme</h3>
+          <p>The District Attorney's office launched a first-offender diversion scheme. Non-violent drug offenders could avoid prosecution entirely by completing education, employment, and community service requirements.</p>
+          <div class="era-card-outcome">Data outcome: Steeper decline begins. Both possession and sales fall through 2010–2011.</div>
+        </div>
+
+        <div class="era-card reveal delay-1" style="--era-color: #d6604d;">
+          <span class="era-card-year">2011 – 2013</span>
+          <h3>AB 109 Prison Realignment</h3>
+          <p>California's Assembly Bill 109 shifted responsibility for low-level offenders from state prisons to county jails, reducing sentence lengths for many drug offenses. A significant structural change to who gets incarcerated and for how long.</p>
+          <div class="era-card-outcome">Data outcome: Continued decline, though sales show a temporary uptick around 2013.</div>
+        </div>
+
+        <div class="era-card reveal delay-2" style="--era-color: #f4a582;">
+          <span class="era-card-year">2014 – 2017</span>
+          <h3>Prop 47 — Felony Reclassification</h3>
+          <p>California voters passed Proposition 47, reclassifying simple drug possession from a felony to a misdemeanour. This was the single largest structural change to drug enforcement in California in decades, reducing arrest incentives significantly.</p>
+          <div class="era-card-outcome">Data outcome: Sharpest sustained decline in possession. Sales also fell but more gradually.</div>
+        </div>
+
+        <div class="era-card reveal delay-3" style="--era-color: #1a9641;">
+          <span class="era-card-year">2018 – Feb 2020</span>
+          <h3>Safe Injection + LEAD Period</h3>
+          <p>San Francisco introduced the Law Enforcement Assisted Diversion (LEAD) programme, redirecting drug users away from arrest toward social services. Simultaneously, safe injection site proposals advanced in city council debates.</p>
+          <div class="era-card-outcome">Data outcome: Possession at historic lows. LEAD showed promise — before the pandemic disrupted everything.</div>
+        </div>
+
+        <div class="era-card reveal delay-1" style="--era-color: #969696;">
+          <span class="era-card-year">Mar 2020 – 2021</span>
+          <h3>COVID Enforcement Collapse</h3>
+          <p>Pandemic lockdowns effectively suspended normal enforcement activity citywide. Police focus shifted, courts operated at reduced capacity, and outdoor drug activity became more visible as indoor spaces closed.</p>
+          <div class="era-card-outcome">Data outcome: Recorded incidents hit the dataset minimum — but open drug use was widely reported to increase.</div>
+        </div>
+
+        <div class="era-card reveal delay-2" style="--era-color: #d73027;">
+          <span class="era-card-year">2022 – 2025</span>
+          <h3>Post-COVID Resurgence</h3>
+          <p>A sharp rebound in recorded drug offenses, particularly possession and opioid-related incidents, driven by fentanyl's dominance in the street drug supply and a return to active enforcement. The Tenderloin Emergency Declaration (2022) attempted to respond with both policing and services.</p>
+          <div class="era-card-outcome">Data outcome: Fastest rate of increase in the dataset. 2025 figures approach pre-Prop 47 levels.</div>
+        </div>
+
+      </div><!-- /era-grid -->
+
+      <div class="bridge reveal delay-3">
+        <p>
+          The city-wide trend is clear. But averages hide geography. The next act looks inside
+          each of San Francisco's ten police districts to ask: did every neighbourhood experience
+          the same story?
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ ACT DIVIDER II ════════════════════════════════════════ -->
+  <div class="act-divider">
+    <div class="act-divider-line"></div>
+    <span class="act-divider-label">Act II — The Geographic Story</span>
+    <div class="act-divider-line"></div>
+  </div>
+
+  <!-- ══ SECTION — ACT II ══════════════════════════════════════ -->
+  <section class="section section--sage">
+    <div class="section-inner">
+      <span class="section-label reveal">Figure 2</span>
+      <h2 class="reveal delay-1">The Map That Moves With Policy</h2>
+      <p class="section-desc reveal delay-2">
+        Month by month, district by district — where did the numbers actually change?
+      </p>
+
+      <div class="text-block reveal delay-2">
+        <p>
+          The interactive visualisation below shows two things simultaneously. On the left,
+          the choropleth map colours each of San Francisco's ten police districts according
+          to how their monthly drug offense count compares to the average of the previous
+          policy era. <strong>Blue means improvement</strong> relative to what came before;
+          <strong>red means worsening</strong>. The era badge at the top right updates as you
+          move through time.
+        </p>
+        <p>
+          Through most of the 2003–2019 period, the map stays predominantly blue — a visual
+          confirmation of what the city-wide chart showed. The critical moment comes around
+          2021–2022: district after district begins to turn red, and it does not recover.
+          The post-COVID resurgence is not confined to one corner of the city; it is citywide.
+        </p>
+        <p>
+          On the right, the ten bar charts show the <strong>sales-to-possession ratio</strong>
+          for each district across all eight policy eras. A ratio below 1 means personal use
+          dominates — the district's drug problem is primarily one of addiction and harm reduction.
+          A ratio above 1 means active dealing outpaces personal use — a supply-side problem
+          that requires different interventions entirely. Watch how this balance shifts over time,
+          particularly in the post-COVID era where several districts show sales activity rising
+          faster than possession.
+        </p>
+      </div>
+
+      <div class="reveal delay-3">
+        <div class="iframe-outer">
+          <div class="iframe-ratio iframe-ratio--tall">
+            <iframe
+              src="visualizations/sf_drug_offenses_act2.html"
+              title="Interactive animated map and bar charts: SF drug offenses by district and policy era"
+              loading="lazy"
+            ></iframe>
+          </div>
+        </div>
+        <a class="fullscreen-link" href="visualizations/sf_drug_offenses_act2.html" target="_blank" rel="noopener noreferrer">
+          Open fullscreen
+          <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        </a>
+        <p class="footnote reveal">
+          Figure 2. Left: choropleth map of SF police districts coloured by monthly drug offense count relative to the previous policy era average (blue = improvement, red = worsening). Right: bar charts showing the sales-to-possession ratio per district across all eight policy eras — the highlighted bar indicates the currently active era. Use the Play button or drag the slider to animate. Source: SFPD via DataSF <sup><a href="#ref-1">[1]</a></sup>.
+        </p>
+      </div>
+
+      <div class="bridge reveal delay-3">
+        <p>
+          The geography tells us <em>where</em> drug crime has changed. But it does not tell us
+          <em>what kind</em> of drug crime is driving the resurgence. That answer requires
+          looking at the composition of offenses — and it reveals something unexpected.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ ACT DIVIDER III ═══════════════════════════════════════ -->
+  <div class="act-divider">
+    <div class="act-divider-line"></div>
+    <span class="act-divider-label">Act III — The Composition Story</span>
+    <div class="act-divider-line"></div>
+  </div>
+
+  <!-- ══ SECTION — ACT III ═════════════════════════════════════ -->
+  <section class="section section--fog">
+    <div class="section-inner">
+      <span class="section-label reveal">Figure 3</span>
+      <h2 class="reveal delay-1">Not the Same Problem It Used to Be</h2>
+      <p class="section-desc reveal delay-2">
+        The drugs have changed. The actions have changed. The policy response has not kept pace.
+      </p>
+
+      <div class="text-block reveal delay-2">
+        <p>
+          In 2003, San Francisco's drug problem was dominated by cocaine — specifically crack
+          cocaine — and marijuana. By 2025, those drugs have largely faded from the official
+          record, replaced by opiates and methamphetamine. This is not a story of more of the
+          same; it is a story of a fundamentally different drug market emerging underneath the
+          same policy framework.
+        </p>
+        <p>
+          The streamgraph below shows how the volume and composition of drug offense types
+          shifted year by year. Toggle between <em>Action Type</em> (what the person was doing)
+          and <em>Drug Type</em> (what substance was involved) to see both dimensions. The rise
+          of opiates from near-zero before 2018 to one of the dominant categories by 2023 is
+          among the most consequential changes in the dataset — and one for which San Francisco's
+          harm-reduction infrastructure, designed largely around cocaine and heroin, was
+          not prepared.
+        </p>
+      </div>
+
+      <div class="reveal delay-3">
+        <div class="iframe-outer">
+          <div class="iframe-ratio">
+            <iframe
+              src="visualizations/crime_streamgraph_interactive.html"
+              title="Interactive streamgraph: SF drug offense composition by action type and drug type"
+              loading="lazy"
+            ></iframe>
+          </div>
+        </div>
+        <a class="fullscreen-link" href="visualizations/crime_streamgraph_interactive.html" target="_blank" rel="noopener noreferrer">
+          Open fullscreen
+          <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        </a>
+        <p class="footnote reveal">
+          Figure 3. Streamgraph showing annual drug offense volume in San Francisco (2003–2025), split by
+          Action Type (possession, sales, transportation, etc.) and Drug Type (cocaine, heroin, opiates,
+          methamphetamine, etc.). Hover over any band to see values. Use the tabs to switch views.
+          Source: SFPD via DataSF <sup><a href="#ref-1">[1]</a></sup>.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ CONCLUSION ════════════════════════════════════════════ -->
+  <section class="section section--navy">
+    <div class="section-inner">
+      <span class="section-label reveal" style="color:var(--ochre);">Conclusion</span>
+      <h2 class="reveal delay-1" style="color:#fff;">Progress Was Real. So Is the Reversal.</h2>
+      <p class="section-desc reveal delay-2" style="color:rgba(255,255,255,0.5); border-bottom-color:rgba(200,169,110,0.22);">
+        What the data tells us — and what it cannot.
+      </p>
+
+      <div class="text-block reveal delay-2">
+        <p style="color:rgba(255,255,255,0.65);">
+          The evidence across all three acts points to the same conclusion: San Francisco's
+          progressive drug policies achieved measurable results. Possession incidents fell by
+          more than 80% between 2009 and 2021. Sales declined across every district.
+          The harm-reduction framework — diversion programmes, treatment courts, LEAD — was
+          working, at least by the metrics that policing data can capture.
+        </p>
+        <p style="color:rgba(255,255,255,0.65);">
+          The post-COVID period has reversed much of that progress, and the reversal carries
+          a warning that goes beyond simple enforcement failures. The drug supply has changed
+          dramatically — fentanyl and synthetic opiates now dominate a market that the city's
+          policy infrastructure was designed to address when heroin and crack cocaine were the
+          primary concerns. A harm-reduction framework built for one drug crisis may be
+          structurally ill-suited to another.
+        </p>
+        <p style="color:rgba(255,255,255,0.65);">
+          Data cannot answer what policy should come next. But it can make one thing clear:
+          the problem returning to San Francisco's streets in 2025 is not the same problem
+          that the city spent two decades learning to manage. Treating it as if it were
+          is unlikely to produce different results.
+        </p>
+      </div>
+
+      <div class="conclusion-box reveal delay-3">
+        <p>
+          "The data does not ask for optimism or pessimism. It asks for honesty about
+          what has changed — and the courage to respond to what is actually there,
+          not what was there before."
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ REFERENCES ════════════════════════════════════════════ -->
+  <section class="section section--parchment">
+    <div class="section-inner">
+      <span class="section-label reveal">References</span>
+      <h2 class="reveal delay-1">Sources</h2>
+      <p class="section-desc reveal delay-2">All data and research cited in this story.</p>
+
+      <ol class="references-list reveal delay-2">
+        <li id="ref-1">
+          <span class="ref-number">[1]</span>
+          <strong>Drug Enforcement in the United States: History, Policy, and Trends.</strong>
+          Sacco, L. N. (2014). Congressional Research Service, Washington, DC.<br>
+          <a href="https://www.fredsakademiet.dk/ordbog/uord/drugs.pdf" target="_blank" rel="noopener noreferrer">https://www.fredsakademiet.dk/ordbog/uord/drugs.pdf</a>
+        </li>
+        <li id="ref-2">
+          <span class="ref-number">[2]</span>
+          <strong>The War on Drugs, the Politics of Crime, and Mass Incarceration in the United States.</strong>
+          Schoenfeld, H. (2012). <em>Journal of Gender, Race &amp; Justice</em>, 15, 331–334. HeinOnline.
+        </li>
+        <li id="ref-3">
+          <span class="ref-number">[3]</span>
+          <strong>Bridging the Gap in San Francisco: The Process of Integrating Harm Reduction and Traditional Substance Abuse Services.</strong>
+          Gleghorn, A., Rosenbaum, M., &amp; Garcia, B. A. (2001). <em>Journal of Psychoactive Drugs</em>, 33(1), 1–7. Taylor &amp; Francis.<br>
+          <a href="https://www.tandfonline.com/doi/pdf/10.1080/02791072.2001.10400461" target="_blank" rel="noopener noreferrer">https://www.tandfonline.com/doi/pdf/10.1080/02791072.2001.10400461</a>
+        </li>
+        <li id="ref-4">
+          <span class="ref-number">[4]</span>
+          <strong>DataSF — San Francisco Open Data Portal.</strong>
+          San Francisco Department of Technology.<br>
+          <a href="https://data.sfgov.org" target="_blank" rel="noopener noreferrer">
+            https://data.sfgov.org
+          </a>
+        </li>
+        <li id="ref-5">
+          <span class="ref-number">[5]</span>
+          <strong>SFPD Incident Reports: Historical 2003 to May 2018.</strong>
+          San Francisco Police Department, via DataSF.<br>
+          <a href="https://data.sfgov.org/Public-Safety/Police-Department-Incident-Reports-Historical-2003/tmnf-yvry"
+             target="_blank" rel="noopener noreferrer">
+            https://data.sfgov.org/Public-Safety/Police-Department-Incident-Reports-Historical-2003/tmnf-yvry
+          </a>
+        </li>
+        <li id="ref-6">
+          <span class="ref-number">[6]</span>
+          <strong>Police Department Incident Reports: 2018 to Present.</strong>
+          San Francisco Police Department, via DataSF.<br>
+          <a href="https://data.sfgov.org/Public-Safety/Police-Department-Incident-Reports-2018-to-Present/wg3w-h783/data_preview"
+             target="_blank" rel="noopener noreferrer">
+            https://data.sfgov.org/Public-Safety/Police-Department-Incident-Reports-2018-to-Present/wg3w-h783/data_preview
+          </a>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ══ FOOTER ════════════════════════════════════════════════ -->
+  <footer>
+    San Francisco Drug Offense Analysis &nbsp;·&nbsp; <span>2003 – 2025</span> &nbsp;·&nbsp; Data: SFPD via DataSF
+  </footer>
+
+  <!-- ══ SCRIPTS ══════════════════════════════════════════════ -->
+  <script>
+    const revealEls = document.querySelectorAll('.reveal');
+    const io = new IntersectionObserver(
+      entries => entries.forEach(e => {
+        e.target.classList.toggle('visible', e.isIntersecting);
+      }),
+      { threshold: 0.12 }
+    );
+    revealEls.forEach(el => io.observe(el));
+
+    document.querySelectorAll('.flip-card').forEach(card => {
+      function toggle() { card.classList.toggle('flipped'); }
+      card.addEventListener('click', toggle);
+      card.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
+      });
+    });
+  </script>
+
 </body>
 </html>
