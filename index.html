@@ -400,6 +400,12 @@
       overflow: hidden;
     }
 
+    .viz-full {
+      width: 100vw;
+      margin-left: calc(-50vw + 50%);
+      margin-right: calc(-50vw + 50%);
+    }
+
     .viz img {
       display: block;
       width: 100%;
@@ -909,8 +915,8 @@
       </div>
 
       <div class="r d3" style="margin-top: 2rem;">
-        <div class="viz">
-          <div class="viz-frame">
+        <div class="viz viz-full">
+          <div class="viz-frame viz-frame--tall" style="height: 930px !important;">
             <iframe
               src="visualizations/crime_streamgraph_interactive.html"
               title="Interactive streamgraph: SF drug offense composition by action type and drug type"
