@@ -406,6 +406,12 @@
       margin-right: calc(-50vw + 50%);
     }
 
+    .viz-wide {
+      width: 80vw;
+      margin-left: calc(-40vw + 50%);
+      margin-right: calc(-40vw + 50%);
+    }
+
     .viz img {
       display: block;
       width: 100%;
@@ -686,7 +692,7 @@
                     <strong style="color:var(--ochre)">Act I</strong> · The city-wide story
                   </li>
                   <li style="padding:0.3rem 0; border-bottom:1px solid rgba(200,169,110,0.2);">
-                    <strong style="color:var(--ochre)">Act II</strong> · The geographic story
+                    <strong style="color:var(--ochre)">Act II</strong> · The neighbourhood breakdown
                   </li>
                   <li style="padding:0.3rem 0;">
                     <strong style="color:var(--ochre)">Act III</strong> · The data in time
@@ -745,12 +751,14 @@
         </p>
       </div>
 
-      <div class="viz r d3" style="margin-top: 2rem;">
-        <img
-          src="images/act1_drug_policy_chart.png"
-          alt="SF drug offenses by possession and sales type across policy eras 2003–2025"
-          loading="eager"
-        />
+      <div class="r d3" style="margin-top: 2rem;">
+        <div class="viz viz-wide">
+          <img
+            src="images/act1_drug_policy_chart.png"
+            alt="SF drug offenses by possession and sales type across policy eras 2003–2025"
+            loading="eager"
+          />
+        </div>
       </div>
       <p class="fig-note r d3">
         Figure 1. Annual drug offense incidents in San Francisco (2003–2025), split by Street Possession &amp; Personal Use and Sales &amp; Distribution. Vertical dashed lines mark key policy interventions. Bold line shows a 3-year rolling average, faint line shows raw annual counts. The bottom panels show the year-on-year percentage change for each category. Source: SFPD via DataSF.<sup><a href="#ref-1">[1]</a></sup>
@@ -862,7 +870,7 @@
   <!-- ACT II DIVIDER -->
   <div class="act">
     <div class="act-line"></div>
-    <span class="act-label">Act II — The geographic story</span>
+    <span class="act-label">Act II — The neighbourhood breakdown</span>
     <div class="act-line"></div>
   </div>
 
@@ -871,7 +879,7 @@
     <div class="sec-inner">
       <span class="label r">Figure 2</span>
       <h2 class="r d1">The map that moves with policy</h2>
-      <p class="sec-desc r d2">Era by era, month by month, district by district</p>
+      <p class="sec-desc r d2">Era by era, month by month, district by district.</p>
 
       <div class="prose r d2">
         <p>
@@ -895,7 +903,7 @@
       </div>
 
       <div class="r d3" style="margin-top: 2rem;">
-        <div class="viz">
+        <div class="viz viz-wide">
           <div class="viz-frame viz-frame--tall">
             <iframe
               src="visualizations/sf_drug_offenses_act2.html"
@@ -941,7 +949,7 @@
           It seems that San Francisco's drug problem has alleviated in time, with the total drug incidents lowering after a peak in 2008 (which could be explained by the financial crisis at the time). The action tab shows that the possession volume decreases after the 2018 LEAD program, however it's seeing an upward trend after 2021. This could be explained by the COVID19 pandemic, reinforcing the idea that the drug shifts are correlated with the financial crises of the time.
         </p>
         <p>
-          Switching to the second tab, it is interesting to observe how the drug preferences change with time. San Francisco's drug landscape has changed since the early 2000s. Marijuana's gradual legalization removed it from public health concern, while cocaine became less visible as it merged into multi-drug use <sup><a href="#ref-8">[8]</a></sup>. The opioid shift unfolded in stages: overprescription of painkillers in the 2000s created widespread dependency and when prescriptions were restricted, many turned to heroin as a cheaper alternative. The market then shifted again as illegaly manufactured fentanyl - which is synthetic, cheap and has a strong effect - replaced heroin almost entirely <sup><a href="#ref-9">[9]</a></sup>. At the same time, Mexican cartels restructured around synthetic production, flooding the West Coast with low-cost methamphetamine.
+          Switching to the second tab, it is interesting to observe how the drug preferences change with time. San Francisco's drug landscape has changed since the early 2000s. Marijuana's gradual legalization removed it from public health concern, while cocaine became less visible as it merged into multi-drug use <sup><a href="#ref-8">[8]</a></sup>. The opioid shift unfolded in stages: overprescription of painkillers in the 2000s created widespread dependency and when prescriptions were restricted, many turned to heroin as a cheaper alternative. The market then shifted again as illegaly manufactured fentanyl (which is synthetic, cheap and has a strong effect) replaced heroin almost entirely <sup><a href="#ref-9">[9]</a></sup>. At the same time, Mexican cartels restructured around synthetic production, flooding the West Coast with low-cost methamphetamine.
         </p>
         <p>Now it's your time to see if there are any insights we missed! Toggle categories on/off and make your own conclusions!</p>
 
