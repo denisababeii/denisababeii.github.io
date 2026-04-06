@@ -353,7 +353,7 @@
       display: grid;
       grid-template-columns: 130px 1fr;
       gap: 2rem;
-      padding: 1.8rem 0;
+      padding: 1.3rem 0;
       border-bottom: 1px solid var(--rule);
       align-items: start;
     }
@@ -383,7 +383,7 @@
       font-size: 0.82rem;
       color: var(--mid);
       line-height: 1.65;
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.3rem;
     }
 
     .era-outcome {
@@ -391,6 +391,8 @@
       font-weight: 500;
       color: var(--accent);
       letter-spacing: 0.03em;
+      display: block;
+      line-height: 1.5;
     }
 
     /* ── Image / iframe ────────────────────────────────────── */
@@ -407,9 +409,9 @@
     }
 
     .viz-wide {
-      width: 80vw;
-      margin-left: calc(-40vw + 50%);
-      margin-right: calc(-40vw + 50%);
+      width: 60vw;
+      margin-left: calc(-30vw + 50%);
+      margin-right: calc(-30vw + 50%);
     }
 
     .viz img {
@@ -669,11 +671,8 @@
           </div>
           <div class="card-back">
             <span class="card-num">ii</span>
-            <h3>Five drug crime categories</h3>
-            <p style="margin-bottom:0.5rem; font-size:0.75rem; letter-spacing:0.1em; text-transform:uppercase; color:rgba(255,255,255,0.3); font-weight:500;">Two main</p>
-            <p>Street Possession &amp; Personal Use:<br> - demand side, addiction-driven.<br>Sales &amp; Distribution:<br> - active street dealing.</p>
-            <p style="margin-top:0.5rem; margin-bottom:0.3rem; font-size:0.75rem; letter-spacing:0.1em; text-transform:uppercase; color:rgba(255,255,255,0.3); font-weight:500;">Three secondary</p>
-            <p>Transportation · Production · Prescription Fraud</p>
+            <h3>Two main drug crime categories</h3>
+            <p>Street Possession &amp; Personal Use:<br> - demand side, addiction-driven.<br><br>Sales &amp; Distribution:<br> - active street dealing.</p>
             <span class="card-toggle">
               <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
               Close
@@ -692,7 +691,7 @@
                     <strong style="color:var(--ochre)">Act I</strong> · The city-wide story
                   </li>
                   <li style="padding:0.3rem 0; border-bottom:1px solid rgba(200,169,110,0.2);">
-                    <strong style="color:var(--ochre)">Act II</strong> · The neighbourhood breakdown
+                    <strong style="color:var(--ochre)">Act II</strong> · The district breakdown
                   </li>
                   <li style="padding:0.3rem 0;">
                     <strong style="color:var(--ochre)">Act III</strong> · The data in time
@@ -835,8 +834,8 @@
         <div class="era r d2">
           <span class="era-year">2018</span>
           <div class="era-body">
-            <h3>Safe injection site bill</h3>
-            <p>San Francisco pursued enabling safe-injection sites and introduced the Law Enforcement Assisted Diversion (LEAD) programme, redirecting people caught with drugs away from arrest and toward social services. This approach reflects a greater focus on harm reduction as a policy framework.</p>
+            <h3>LEAD diversion period</h3>
+            <p>San Francisco pursued enabling safe-injection sites (rejected) and introduced the Law Enforcement Assisted Diversion (LEAD) programme, redirecting people caught with drugs away from arrest and toward social services. This approach reflects a greater focus on harm reduction as a policy framework.</p>
             <span class="era-outcome">Possession reaches historic lows. Sales, however, increased by 56% in 2018, this may correspond with fentanyl's impact on the street supply market during this period, potentially outpacing the LEAD program's response.</span>
           </div>
         </div>
@@ -862,7 +861,7 @@
       </div><!-- /eras -->
 
       <div class="bridge r d3">
-        <p>The city-wide trend is clear. But averages hide geography. The next act looks inside each of San Francisco's ten police districts to ask: did every neighbourhood experience the same story?</p>
+        <p>The city-wide trend is clear. But averages hide geography. The next act looks inside each of San Francisco's ten police districts to ask: did every police district experience the same story?</p>
       </div>
     </div>
     </section>
@@ -870,7 +869,7 @@
   <!-- ACT II DIVIDER -->
   <div class="act">
     <div class="act-line"></div>
-    <span class="act-label">Act II — The neighbourhood breakdown</span>
+    <span class="act-label">Act II — The district breakdown</span>
     <div class="act-line"></div>
   </div>
 
@@ -917,7 +916,7 @@
           <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
         </a>
         <p class="fig-note r">
-          Figure 2. Left: choropleth map coloured by monthly drug offense count relative to the previous policy era average (blue = improvement, red = worsening). Right: sales-to-possession ratio per district across all eight policy eras. Use the left side buttons to play or pause, or drag the slider to see a specific time frame. Source: SFPD via DataSF.<sup><a href="#ref-4">[4]</a></sup>
+          Figure 2. Left: choropleth map coloured by monthly drug offense count relative to the previous policy era average (blue = improvement, red = worsening). Right: sales-to-possession ratio per district across all eight policy eras. Use the left side buttons to play or pause, or drag the slider to see a specific time frame. Source: SFPD via DataSF<sup><a href="#ref-4">[4]</a></sup>. Note: the animation starts in 2006 with the second policy era because the first one is used as the baseline for comparison.
         </p>
       </div>
 
