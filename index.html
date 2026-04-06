@@ -406,6 +406,12 @@
       margin-right: calc(-50vw + 50%);
     }
 
+    .viz-wide {
+      width: 80vw;
+      margin-left: calc(-40vw + 50%);
+      margin-right: calc(-40vw + 50%);
+    }
+
     .viz img {
       display: block;
       width: 100%;
@@ -745,12 +751,14 @@
         </p>
       </div>
 
-      <div class="viz r d3" style="margin-top: 2rem;">
-        <img
-          src="images/act1_drug_policy_chart.png"
-          alt="SF drug offenses by possession and sales type across policy eras 2003–2025"
-          loading="eager"
-        />
+      <div class="r d3" style="margin-top: 2rem;">
+        <div class="viz viz-wide">
+          <img
+            src="images/act1_drug_policy_chart.png"
+            alt="SF drug offenses by possession and sales type across policy eras 2003–2025"
+            loading="eager"
+          />
+        </div>
       </div>
       <p class="fig-note r d3">
         Figure 1. Annual drug offense incidents in San Francisco (2003–2025), split by Street Possession &amp; Personal Use and Sales &amp; Distribution. Vertical dashed lines mark key policy interventions. Bold line shows a 3-year rolling average, faint line shows raw annual counts. The bottom panels show the year-on-year percentage change for each category. Source: SFPD via DataSF.<sup><a href="#ref-1">[1]</a></sup>
@@ -895,7 +903,7 @@
       </div>
 
       <div class="r d3" style="margin-top: 2rem;">
-        <div class="viz">
+        <div class="viz viz-wide">
           <div class="viz-frame viz-frame--tall">
             <iframe
               src="visualizations/sf_drug_offenses_act2.html"
